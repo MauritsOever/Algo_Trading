@@ -1,19 +1,35 @@
 # load in appropriate packages
 import pandas as pd
+from matplotlib import pyplot as plt
 import numpy as np
+class Assignment3():
+
+    def __init__(self, train_data_file, test_data_file):
+
+        self.train_data = pd.read_csv(train_data_file)
+        self.test_data = pd.read_csv(test_data_file)
+
+    def fill_na(self, data):
+
+        data.ffill()
+        data.bfill()
+
+
+
 
 # load in and prepare data
-data_train = pd.read_csv('Bond_MidModelTraining.csv')
-data_test  = pd.read_csv('Bond_QuoteLive.csv')
+train_data_file = 'Bond_MidModelTraining.csv'
+test_data_file  = 'Bond_QuoteLive.csv'
 
-data_train = data_train.ffill()
-data_train = data_train.bfill() # because the first entry in some columns is a nan too
+# Instantiate Assignment3
 
-data_test = data_test.ffill()
-#data_test = data_test.bfill() # same for the test set
+assignment = Assignment3(train_data_file, test_data_file)
+
+# Fill nans.
+assignment.fill_na(assignment.train_data)
+assignment.test_data.fill_na(assignment.test_data)
 
 # check if both sets are ordered properly by epochhours
-#if data_train.iloc[:,0] == data_train.sort_values(0)
 
 if not np.all(data_train.sort_values('epochhours').index == data_train.index):
     data_train = data_train.sort_values('epochhours', ignore_index=True)
@@ -26,3 +42,5 @@ np.all(data_test.index == data_test.sort_values('epochhours').index)
 
 data_train['midDealerQuotes'] = (data_train.firm_executable_bid + data_train.firm_executable_ask) / 2
 data_train['midMarketEstimate'] = (data_train.market_estimate_bid + data_train.market_estimate_ask) / 2
+
+plt.plot(data_train.midDealerQuotes)
