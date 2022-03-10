@@ -15,7 +15,7 @@ class Assignment3():
         data.bfill()
 
 
-
+# HERE WE RUN THE CODE
 
 # load in and prepare data
 train_data_file = 'Bond_MidModelTraining.csv'
