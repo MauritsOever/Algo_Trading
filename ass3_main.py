@@ -35,51 +35,65 @@ class Assignment3():
         self.test_data['midDealerQuotes'] = (self.test_data['firm_executable_bid']
                                               + self.test_data['firm_executable_ask']) / 2
 
-        self.test_data['midDealerQuotes'] = (self.test_data['market_estimate_bid']
+        self.test_data['midMarketEstimate'] = (self.test_data['market_estimate_bid']
                                               + self.test_data['market_estimate_ask']) / 2
 
     def generate_plots(self):
 
         # Create figure.
-        fig, axs = plt.subplots(2, 2)
+        fig, axs = plt.subplots(2, 2, sharex = True)
 
-        fig.suptitle('Epoch Hours')
+        fig.suptitle('Epoch Hours vs LastPrice, midDealerQuotes and midMarketEstimate')
 
         axs[0, 0].plot(
             self.train_data['epochhours'],
-            self.train_data['last_price']
-            )
+            self.train_data['last_price'],
+            color = 'orange'
+        )
+        axs[0, 0].set_title("Last Price vs Epoch Hours")
 
         axs[0, 1].plot(
             self.train_data['epochhours'],
-            self.train_data['midDealerQuotes']
-            )
+            self.train_data['midDealerQuotes'],
+            color = 'green'
+        )
+        axs[0, 1].set_title("midDealerQuotes vs Epoch Hours")
 
         axs[1, 0].plot(
             self.train_data['epochhours'],
-            self.train_data['midMarketEstimate']
-            )
+            self.train_data['midMarketEstimate'],
+            color = 'blue'
+        )
+        axs[1, 0].set_title("midMarketEstimate vs Epoch Hours")
+
+        axs[1, 1].set_title("All vs Epoch Hours")
 
         axs[1, 1].plot(
             self.train_data['epochhours'],
-            self.train_data['last_price']
-            )
+            self.train_data['last_price'],
+            label = 'Last Price',
+            color = 'orange',
+            alpha = 0.5
+        )
 
         axs[1, 1].plot(
             self.train_data['epochhours'],
-            self.train_data['last_price']
-            )
+            self.train_data['midDealerQuotes'],
+            label = 'midDealerQuotes',
+            color = 'green',
+            alpha = 0.3
+        )
 
         axs[1, 1].plot(
             self.train_data['epochhours'],
-            self.train_data['midDealerQuotes']
-            )
+            self.train_data['midMarketEstimate'],
+            label = 'midMarketEstimate',
+            color = 'blue',
+            alpha = 0.3
+        )
 
-        axs[1, 1].plot(
-            self.train_data['epochhours'],
-            self.train_data['midMarketEstimate']
-            )
-
+        plt.tight_layout()
+        plt.legend()
         plt.show()
 
 
