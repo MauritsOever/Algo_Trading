@@ -21,15 +21,29 @@ class Assignment3():
     def check_order(self, data):
         if not np.all(data.sort_values('epochhours').index == data.index):
             data = data.sort_values('epochhours')
+            
+    def calculate_mids(self):
+
+        self.train_data['midDealerQuotes'] = (self.train_data['firm_executable_bid']
+                                              + self.train_data['firm_executable_ask']) / 2
+
+        self.train_data['midMarketEstimate'] = (self.train_data['market_estimate_bid']
+                                              + self.train_data['market_estimate_ask']) / 2
+
+        self.test_data['midDealerQuotes'] = (self.test_data['firm_executable_bid']
+                                              + self.test_data['firm_executable_ask']) / 2
+
+        self.test_data['midMarketEstimate'] = (self.test_data['market_estimate_bid']
+                                              + self.test_data['market_estimate_ask']) / 2
     
     def calculate_returns(self, data):
         # LastPrice, midDealerQuotes, midMarketEstimate 
-        print((data.last_price / data.last_price.shift(1) - 1) * 10000)
-        data['LastPrice_rets'] = (data.last_price / data.last_price.shift(1) -1) * 10000
-        #data.midDealerQuotesRets = (data.midDealerQuotes / data.midDealerQuotes.shift(1)) -1 * 10000
-        #data.midMarketEstimate = (data.midMarketEstimate / data.midMarketEstimate.shift(1)) -1 * 10000
+        data['LastPrice_rets'] = (data['last_price'] / data['last_price'].shift(1) -1) * 10000
+        data['midDealerQuotes_rets'] = (data['midDealerQuotes'] / data['midDealerQuotes'].shift(1) -1) * 10000
+        data['midMarketEstimate_rets'] = (data['midMarketEstimate'] / data['midMarketEstimate'].shift(1) -1) * 10000
     
-    def make_matrix(self):
+    def make_matrices(self):
+        
         return
     
     def est_OLS(self):
@@ -68,6 +82,11 @@ assignment.fill_na()
 assignment.check_order(assignment.train_data)
 assignment.check_order(assignment.test_data)
 
+# calculate mid prices
+assignment.calculate_mids()
+
 # calculate returns
 assignment.calculate_returns(assignment.train_data)
 assignment.calculate_returns(assignment.test_data)
+
+
