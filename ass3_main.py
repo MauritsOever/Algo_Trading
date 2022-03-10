@@ -43,27 +43,44 @@ class Assignment3():
         data['midMarketEstimate_rets'] = (data['midMarketEstimate'] / data['midMarketEstimate'].shift(1) -1) * 10000
     
     def make_matrices(self):
-        
+        self.Y = np.array(self.train_data['LastPrice_rets'][1:])
+        self.X = np.ones((len(self.train_data)-1 , 3))
+        self.X[:,1] = self.train_data['midDealerQuotes_rets'][1:]
+        self.X[:,2] = self.train_data['midMarketEstimate_rets'][1:] 
         return
     
     def est_OLS(self):
-        return
-    
-    def get_yhat(self, Betas, X):
-        return
-    
-    def get_r2(self, yhat, Y):
+        self.betas = np.linalg.inv(self.X.T @ self.X) @ self.X.T @ self.Y
+        print('estimated betas are equal to')
+        print(f'constant                              = {round(self.betas[0], 4)}')
+        print(f'midDealerQuotes returns coefficient   = {round(self.betas[1], 4)}')
+        print(f'midMarketEstimate returns coefficient = {round(self.betas[2], 4)}')
+        
         return 
     
-    def get_MAE(self, yhat, Y):
+    def get_yhat(self):
+        self.yhat = self.X @ self.betas
         return
-        
     
+    def get_r2(self):
+        self.r2 = 1 - np.sum( (self.Y - self.yhat)**2) / np.sum( (self.Y - np.mean(self.Y))**2)
+        print(f'R squared = {self.r2}')
+        return 
+    
+    def get_MAE(self):
+        self.MAE = np.mean(abs(self.Y - self.yhat))
+        
+        print(f'MAE       = {self.MAE}')
+        return 
+        
+    def XGBoost(self):
+        
+        return
     
 # HERE WE RUN THE CODE
 
 # load in and prepare data
-# Get current working directory.
+# Get current working directory
 cwd = os.curdir
 
 # Get data file paths.
@@ -89,4 +106,10 @@ assignment.calculate_mids()
 assignment.calculate_returns(assignment.train_data)
 assignment.calculate_returns(assignment.test_data)
 
+# OLS here
+assignment.make_matrices()
+assignment.est_OLS() # estimate OLS using analytical solution
+assignment.get_yhat() # calculate the estimated Y
+assignment.get_r2() # calculate r2
+assignment.get_MAE() # calculate mean absolute error
 
