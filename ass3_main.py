@@ -76,52 +76,37 @@ class Assignment3():
         print(f'MAE       = {self.MAE}')
         return 
         
-    def gboost(self):
         
-        x_train = self.train_data[[
-                'epochhours',
-                'firm_executable_bid',
-                'firm_executable_ask',
-                'market_estimate_bid',
-                'market_estimate_ask',
-                'midDealerQuotes',
-                'midMarketEstimate'
-            ]].iloc[:-1,:]
-
-        y_train = self.train_data['last_price'].iloc[1:]
+    def OLS_Q8(self):
+        X = np.array(self.train_data[[
+                'last_price'
+            ]].iloc[:-1,:])
         
-        print(len(x_train))
-        print(len(y_train))
+        Y = np.array(self.train_data['last_price'].iloc[1:])
         
-        reg = GradientBoostingRegressor(n_estimators = 500, 
-                                        max_depth=4, 
-                                        min_samples_split=5, 
-                                        learning_rate=0.01,
-                                        loss = 'lad')
-        reg.fit(x_train, y_train)
+        betas = np.linalg.inv(X.T @ X) @ X.T @ Y
         
-        x_test = self.test_data[[
-                'epochhours',
-                'firm_executable_bid',
-                'firm_executable_ask',
-                'market_estimate_bid',
-                'market_estimate_ask',
-                'midDealerQuotes',
-                'midMarketEstimate'
-            ]]
+        print(f'betas are {betas}')
+        print()
         
-        self.test_data.iloc[1:, 6] = reg.predict(x_test.iloc[:-1,:])
+        X_test = np.array(self.test_data[[
+                'last_price'
+            ]].iloc[0:-1, :])
         
-        # still need to get MAE and stuff
-        errors = np.array(self.test_data['last_price'] - self.test_data['FlowTradersMidpoint '])[1:]
-        MAE    = np.mean(abs(errors))
-        print(MAE)
+        errors = self.test_data.iloc[1:, 1] - X_test @ betas
+        print(errors)
+        print()
         
+        print(f'MAE of OLS question 8 = {np.mean(abs(errors))}')
         
     def flow_bid_and_ask(self):
+        
         self.test_data.iloc[:, 7] = self.test_data.iloc[:, 6] * 1.001
         self.test_data.iloc[:, 8] = self.test_data.iloc[:, 6] * 0.999
         
+        plt.plot(range(len(self.test_data.iloc[1:, 8])), self.test_data.iloc[1:,8])
+        plt.plot(range(len(self.test_data.iloc[1:, 6])), self.test_data.iloc[1:,6])
+        plt.plot(range(len(self.test_data.iloc[1:, 7])), self.test_data.iloc[1:,7])
         
     def gboost2(self):
 
@@ -183,9 +168,9 @@ assignment.calculate_returns(assignment.test_data)
 # assignment.get_r2() # calculate r2
 # assignment.get_MAE() # calculate mean absolute error
 
-# ML here
-assignment.gboost()
+# OLS Q8
+assignment.OLS_Q8()
 
 # fill in flow bid and ask
-assignment.flow_bid_and_ask()
+#assignment.flow_bid_and_ask()
 
