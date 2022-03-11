@@ -86,9 +86,9 @@ class Assignment3():
                 'market_estimate_ask',
                 'midDealerQuotes',
                 'midMarketEstimate'
-            ]].iloc[1:,:]
+            ]].iloc[:-1,:]
 
-        y_train = self.train_data['last_price'].iloc[:-1]
+        y_train = self.train_data['last_price'].iloc[1:]
         
         print(len(x_train))
         print(len(y_train))
