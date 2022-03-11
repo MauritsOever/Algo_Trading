@@ -316,9 +316,9 @@ assignment.calculate_returns(assignment.test_data)
 assignment.OLS_Q8()
 
 # fill in flow bid and ask
-assignment.flow_bid_and_ask()
-
 assignment.generate_plots()
 
 assignment.random_forest()
+
+assignment.flow_bid_and_ask()
 
