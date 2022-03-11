@@ -3,6 +3,9 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
 import os
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import RepeatedKFold
 
 class Assignment3():
 
@@ -73,15 +76,53 @@ class Assignment3():
         print(f'MAE       = {self.MAE}')
         return 
         
-    def XGBoost(self):
+    def gboost(self):
         
-        return
+        x_train = self.train_data[['midDealerQuotes_rets', 'midMarketEstimate_rets', 'midDealerQuotes']].iloc[1:,:] 
+        y_train = self.train_data['LastPrice_rets'].iloc[1:]
+        
+        params = {
+            "n_estimators": 500,
+            "max_depth": 4,
+            "min_samples_split": 5,
+            "learning_rate": 0.01,
+            "loss": "absolute_error",
+            }
+        
+        reg = GradientBoostingRegressor(n_estimators = 500, max_depth=4, 
+                                                 min_samples_split=5, learning_rate=0.01,
+                                                 loss = 'lad')
+        reg.fit(x_train, y_train)
+        
+        return reg
+    
+    def gboost2(self):
+
+        X = self.train_data[[
+                'epochhours',
+                'firm_executable_bid',
+                'firm_executable_ask',
+                'market_estimate_bid',
+                'market_estimate_ask',
+                'midDealerQuotes',
+                'midMarketEstimate'
+            ]]
+
+        y = self.train_data['last_price']
+
+        model = GradientBoostingRegressor()
+
+        cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+
+        n_scores = cross_val_score(model, X, y, scoring='neg_mean_absolute_error', cv = cv, n_jobs = -1, error_score = 'raise')
+
+        print('MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
     
 # HERE WE RUN THE CODE
 
 # load in and prepare data
 # Get current working directory
-cwd = os.curdir
+cwd = os.getcwd()
 
 # Get data file paths.
 train_data_file = os.path.join(cwd, 'Bond_MidModelTraining.csv')
@@ -113,3 +154,5 @@ assignment.get_yhat() # calculate the estimated Y
 assignment.get_r2() # calculate r2
 assignment.get_MAE() # calculate mean absolute error
 
+# ML here
+fitted_model = assignment.gboost2()
