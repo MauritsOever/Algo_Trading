@@ -3,9 +3,6 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
 import os
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import RepeatedKFold
 
 class Assignment3():
 
