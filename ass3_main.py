@@ -78,24 +78,51 @@ class Assignment3():
         
     def gboost(self):
         
-        x_train = self.train_data[['midDealerQuotes_rets', 'midMarketEstimate_rets', 'midDealerQuotes']].iloc[1:,:] 
-        y_train = self.train_data['LastPrice_rets'].iloc[1:]
+        x_train = self.train_data[[
+                'epochhours',
+                'firm_executable_bid',
+                'firm_executable_ask',
+                'market_estimate_bid',
+                'market_estimate_ask',
+                'midDealerQuotes',
+                'midMarketEstimate'
+            ]].iloc[1:,:]
+
+        y_train = self.train_data['last_price'].iloc[:-1]
         
-        params = {
-            "n_estimators": 500,
-            "max_depth": 4,
-            "min_samples_split": 5,
-            "learning_rate": 0.01,
-            "loss": "absolute_error",
-            }
+        print(len(x_train))
+        print(len(y_train))
         
-        reg = GradientBoostingRegressor(n_estimators = 500, max_depth=4, 
-                                                 min_samples_split=5, learning_rate=0.01,
-                                                 loss = 'lad')
+        reg = GradientBoostingRegressor(n_estimators = 500, 
+                                        max_depth=4, 
+                                        min_samples_split=5, 
+                                        learning_rate=0.01,
+                                        loss = 'lad')
         reg.fit(x_train, y_train)
         
-        return reg
-    
+        x_test = self.test_data[[
+                'epochhours',
+                'firm_executable_bid',
+                'firm_executable_ask',
+                'market_estimate_bid',
+                'market_estimate_ask',
+                'midDealerQuotes',
+                'midMarketEstimate'
+            ]]
+        
+        self.test_data.iloc[1:, 6] = reg.predict(x_test.iloc[:-1,:])
+        
+        # still need to get MAE and stuff
+        errors = np.array(self.test_data['last_price'] - self.test_data['FlowTradersMidpoint '])[1:]
+        MAE    = np.mean(abs(errors))
+        print(MAE)
+        
+        
+    def flow_bid_and_ask(self):
+        self.test_data.iloc[:, 7] = self.test_data.iloc[:, 6] * 1.001
+        self.test_data.iloc[:, 8] = self.test_data.iloc[:, 6] * 0.999
+        
+        
     def gboost2(self):
 
         X = self.train_data[[
@@ -117,6 +144,8 @@ class Assignment3():
         n_scores = cross_val_score(model, X, y, scoring='neg_mean_absolute_error', cv = cv, n_jobs = -1, error_score = 'raise')
 
         print('MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
+        
+        return 
     
 # HERE WE RUN THE CODE
 
@@ -148,11 +177,15 @@ assignment.calculate_returns(assignment.train_data)
 assignment.calculate_returns(assignment.test_data)
 
 # OLS here
-assignment.make_matrices()
-assignment.est_OLS() # estimate OLS using analytical solution
-assignment.get_yhat() # calculate the estimated Y
-assignment.get_r2() # calculate r2
-assignment.get_MAE() # calculate mean absolute error
+# assignment.make_matrices()
+# assignment.est_OLS() # estimate OLS using analytical solution
+# assignment.get_yhat() # calculate the estimated Y
+# assignment.get_r2() # calculate r2
+# assignment.get_MAE() # calculate mean absolute error
 
 # ML here
-fitted_model = assignment.gboost2()
+assignment.gboost()
+
+# fill in flow bid and ask
+assignment.flow_bid_and_ask()
+
